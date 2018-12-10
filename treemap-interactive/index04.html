@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/style.css" type="text/css" media="screen"/>
+
+
+<div id="filters">
+    
+</div><!-- @end #filters -->
+
+<div id="jobs">
+    <div id="treemapholder"></div>
+    <div id="loadprogress">Loading Data&hellip;<br /><span class="progvalue">0</span>%</div>
+</div><!-- @end #jobs -->
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var margin = {top: 40, right: 0, bottom: 10, left: 0},
+    width = 954,
+    height = 600;
+
+var currState = 'nat';
+var medCutoff = 40000;
+var showParentLab = true;
+var currOcc = null;
+
+var treemap = d3.layout.treemap()
+    .size([width, height])
+    .sticky(true)
+    .padding(2)
+    .sort(function(a, b) { return a.value - b.value; })
+    .value(function(d) { return d[currState]; });
+    
+var div = d3.select("body #treemapholder").append("div")
+    .attr("id", "treemap")
+    .style("position", "relative")
+    .style("width", (width + margin.left + margin.right) + "px")
+    .style("height", (height + margin.top + margin.bottom) + "px")
+    .style("left", margin.left + "px")
+    .style("top", margin.top + "px");
+
+
+// Load the employment data
+d3.json("data/occs2013.json")
+    
+    // Show loading progress for data file
+    .on("progress", function() {
+        d3.select("#loadprogress .progvalue").text(Math.round(100 * d3.event.loaded / 1075072));
+    })
+    .get(function(error, root) {
+        d3.select("#loadprogress").remove();
+        var node = div.datum(root).selectAll(".node")
+            .data(treemap.nodes)
+            .enter().append("div")
+                .attr("class", function(d) { return d.children ? "parent node" : "node"; })
+                .attr("id", function(d) { return 'occnode' + d.ocode })
+                .call(position);
+
+
+        // Append labels to wider rectangles
+        var label = node.append("div")
+            .attr("class", "childlabel")
+            .text(function(d) {
+                if (d.children || d.dx*d.dy < 800) { return null; }
+                else { return d.name; }
+            });
+
+
+        // Append group labels on top
+        d3.selectAll(".parent").data().map(function(d) {  
+            if (d.name === "occs") return null;
+            if (d.dx <= 22) return null;
+            if (d.dy <= 22) return null;
+                div.append("div")
+                    .text(d.name)
+                    .style("left", d.x + "px")
+                    .style("top", d.y + "px")
+                    .style("width", (d.dx-22) + "px")
+                    .style("height", (d.dy-22) + "px")
+                    .attr("class", "parentlabel")
+                    .attr("id", "plab"+d.ocode);
+        });
+        d3.selectAll(".parentlabel")
+            .call(positionParentLabels);
+
+        node.attr("class", medHighlight);
+    
+    }); // @end on load event
+
+
+
+function position() {
+  this.style("left", function(d) { return d.x + "px"; })
+      .style("top", function(d) { return d.y + "px"; })
+      .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
+      .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
+}
+
+function positionParentLabels() {
+    d3.selectAll(".parent").data().map(function(d) {
+        
+        d3.select("#plab" + d.ocode)
+            .transition().duration(1000)
+            .style("left", d.x + "px")
+            .style("top", d.y + "px")
+            .style("width", (d.dx-22) + "px")
+            .style("height", (d.dy-22) + "px")
+            .style("display", function() { return d.dx > 22 && showParentLab ? "block" : "none" });
+        });
+}
+
+function medHighlight(d) {
+      if (d.children) {
+         return "parent node"; 
+      } else if (d[currState+"m"] > medCutoff && !d.children) {
+          return "node highlight";
+      } else {
+          return "node";
+      }
+}
+
+
+
+</script>
+
+

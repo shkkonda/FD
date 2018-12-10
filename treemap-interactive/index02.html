@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/style.css" type="text/css" media="screen"/>
+
+
+<div id="filters">
+    
+</div><!-- @end #filters -->
+
+
+<div id="jobs">
+    <div id="treemapholder"></div>
+    <div id="loadprogress">Loading Data&hellip;<br /><span class="progvalue">0</span>%</div>
+</div><!-- @end #jobs -->
+
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var margin = {top: 40, right: 0, bottom: 10, left: 0},
+    width = 954,
+    height = 600;
+
+var div = d3.select("body #treemapholder").append("div")
+    .attr("id", "treemap")
+    .style("position", "relative")
+    .style("width", (width + margin.left + margin.right) + "px")
+    .style("height", (height + margin.top + margin.bottom) + "px")
+    .style("left", margin.left + "px")
+    .style("top", margin.top + "px");
+
+
+// Load the employment data
+d3.json("data/occs2013.json")
+    
+    // Show loading progress for data file
+    .on("progress", function() {
+        d3.select("#loadprogress .progvalue").text(Math.round(100 * d3.event.loaded / 1075072));
+    })
+    .get(function(error, root) {
+        d3.select("#loadprogress").text("Data Loaded!");
+        
+    }); // @end on load event
+
+</script>
+
+

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>How Americans Spend Their Day</title>
+	<link rel="stylesheet" type="text/css" href="./area.css" />
+    <script type="text/javascript" src="http://media.flowingdata.com/js/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="http://media.flowingdata.com/js/d3.js?1.29.1"></script>
+	<script type="text/javascript" src="http://media.flowingdata.com/js/d3.time.js?1.29.1"></script>
+	<script type="text/javascript" src="http://media.flowingdata.com/js/d3.csv.js?1.29.1"></script>
+	
+	<script type="text/javascript">
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-865100-8']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+	</script>
+  </head>
+<body>
+<div id="main-wrapper">
+	<div id="fd-header">
+		<a href="http://flowingdata.com"><img src="./logo-lone.png" title="FlowingData" /></a>
+	</div>
+	<div id="header">
+		<div class="right"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://projects.flowingdata.com/timeuse/" data-text="How do Americans spend their day?" data-count="vertical" data-via="flowingdata">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div>
+		<h1>How Americans Spend Their Day</h1>
+		<p>The <a href="http://www.bls.gov/tus/">American Time Use Survey</a> measures how people spend their day. Participants, aged 15 or older, keep track of everything they do for a day and are then interviewed over telephone. Based on responses from thousands between 2005 and 2009, this shows estimates for the percentage of people spending time sleeping, eating, etc during the hours of the day. <strong><a href="http://flowingdata.com/2011/09/20/how-do-americans-spend-their-days/">Read more...</a></strong></p>
+		<div class="clr"></div>
+	</div><!-- @end header -->
+
+	<div id="explain" class="left">
+		<h3>Everyone</h3>
+		<p>The essentials &mdash; sleeping, eating, and working &mdash; take up the better part of the day, often ended with watching television.</p>
+	</div><!-- @end explain -->
+
+	<div id="filters">
+		<table class="left">
+			<tr>
+				<td><a onclick="transition(0)" id="everyone" class="current">Everyone</a></td>
+			</tr>
+			<tr>
+				<td><a onclick="transition(1)" id="men">Men</a></td>
+			</tr>
+			<tr>
+				<td><a onclick="transition(2)" id="women">Women</a></td>
+			</tr>
+		</table>
+		<table class="left">
+			<tr>
+				<td><a onclick="transition(3)" id="teens">Age 15 to 19</a></td>
+			</tr>
+			<tr>
+				<td><a onclick="transition(4)" id="adults">18 and over</a></td>
+			</tr>
+			<tr>
+				<td><a onclick="transition(5)" id="seniors">75 and over</a></td>
+			</tr>
+		</table>
+		
+		<table class="left">
+			<tr>
+				<td><a onclick="transition(6)" id="kids">With children</a></td>
+			</tr>
+			<tr>
+				<td><a onclick="transition(7)" id="young">Children under 3</a></td>
+			</tr>
+			<tr>
+				<td><a onclick="transition(8)" id="nokids">No children</a></td>
+			</tr>
+		</table>
+
+		<div class="clr"></div>
+	</div><!-- @end filters -->
+
+	<div class="clr"></div>
+
+
+	<div id="vis"></div>
+
+
+</div><!-- @end main-wrapper -->
+<div id="footer-wrapper">
+	
+	<div id="footer">
+		By Nathan Yau, <a href="http://flowingdata.com">FlowingData</a>; inspired by <a href="http://www.nytimes.com/interactive/2009/07/31/business/20080801-metrics-graphic.html">The New York Times</a><br /><br />
+		<small>(Not tested in IE)</small>
+	</div>
+	
+</div><!-- @end footer-wrapper -->
+
+<script type="text/javascript">
+
+
+var w = 160,
+    h = 95,
+    p = 20,
+	x = d3.time.scale().domain([new Date(2011, 1, 1, 0), new Date(2011, 1, 1, 23)]).range([15, w]),
+	y = d3.scale.linear().domain([0, 1]).range([h, 20]),
+	hourformat = d3.time.format("%I %p");;
+var area = 	d3.svg.area()
+    .x(function(d) { return x(d.x); })
+    .y0(h - 1)
+    .y1(function(d) { return y(d.y); });
+
+var areaClasses = { "Sleeping":"sleeping", "Eating and drinking":"eating", "Family care":"care", "Shopping":"shopping", "Household activities":"household", "Education":"education", "Watching television":"television", "Socializing":"socializing", "Leisure and sports":"leisure", "Volunteering":"volunteering", "Working":"working", "Religious activities":"religious", "Correspondence":"correspondence", "Sports and recreation":"sports", "Professional and personal care":"procare" };
+
+var activities,
+	areaClass,
+	demogData = [],
+	currDemog = "everyone", 
+	currData = [];
+d3.text('timeuse-all.csv', 'text/csv', function(text) {
+	
+	activities = d3.csv.parseRows(text);
+	
+	for (i=1; i < activities.length; i++) {
+		
+		if (currDemog != activities[i][0]) {
+			demogData.push(currData);
+			currData = [];
+		}
+		currDemog = activities[i][0];
+		
+		if (activities[i][1] in areaClasses) areaClass = areaClasses[ activities[i][1] ];
+		else areaClass = "area";
+		
+		var justhours = activities[i].slice(2, 26);
+		var adata = justhours.map(function(y, i) {
+			return { x: new Date(2011, 1, 1, i), y: y };
+		});
+		for (j=0; j < adata.length; j++) { adata[j].y = parseFloat(adata[j].y) / 100; }
+		currData.push(adata);
+		
+		if (currDemog == "everyone") {
+			var vis = d3.select("#vis")
+				.append("div")
+				  .attr("class", function() { 
+					if (i == 1 || i == 5 || i == 9) return "chart noborder";
+					else if (i == 4 || i == 8 || i == 12) return "chart endrow";
+					else return "chart";
+				  })
+
+				.append("svg:svg")
+				    .attr("width", w + p * 2)
+				    .attr("height", h + p * 2)
+				  .append("svg:g")
+				    .attr("transform", "translate(" + p + "," + p + ")");
+
+
+			var rules = vis.selectAll("g.rule")
+			    .data(x.ticks(d3.time.hours, 12))
+			  .enter().append("svg:g")
+			    .attr("class", "rule");
+
+			rules.append("svg:line")
+			    .attr("x1", x)
+			    .attr("x2", x)
+			    .attr("y1", 20)
+			    .attr("y2", h-1);
+
+			rules.append("svg:line")
+				.attr("class", "axis")
+				.attr("y1", h)
+				.attr("y2", h)
+				.attr("x1", -20)
+				.attr("x2", w+1);
+
+			vis.append("svg:text")
+				.attr("x", -18)
+				.text(activities[i][1])
+				.attr("class", "aheader");
+
+			rules.append("svg:text")
+				.attr("class", "ticklabel")
+				.attr("y", h)
+				.attr("x", x)
+				.attr("dx", 8)
+				.attr("dy", 11)
+				.attr("text-anchor", "middle")
+				.text(hourformat);
+
+			vis.append("svg:text")
+				.attr("x", -12)
+				.attr("y", h-4)
+				.text("0%")
+				.attr("text-anchor", "right")
+				.attr("class", "ticklabel");
+
+			vis.append("svg:text")
+				.attr("x", -18)
+				.attr("y", 20)
+				.text("100%")
+				.attr("text-anchor", "right")
+				.attr("class", "ticklabel");
+
+
+			vis.append("svg:path")
+				.data([adata])
+			    .attr("class", areaClass)
+			    .attr("d", area);
+		} // @end if everyone
+
+	} // @end for loop
+	
+	demogData.push(currData);
+			
+}); // @end text
+
+
+
+function transition(index) {
+	var dataselect = demogData[index];
+	d3.selectAll("path").each(function(d, i) {
+		d3.select(this)
+			.data([dataselect[i]])
+		.transition()
+			.duration(500)
+			.attr("d", area);
+	});
+}
+
+var explain = { 
+	"everyone": "The essentials &mdash; sleeping, eating, and working &mdash; take up the better part of the day, often ended with watching television.", 
+	"men":"Work peaks at 11 in the morning with 35.4 percent of men working. Household activities and family care are lower on average compared to that of women.", 
+	"women": "The percentage working at peak hours is lower than that of men, with higher percentages for household activity and family care.", 
+	"teens":"A lot of time is spent in school or with education-related activities. They also tend to sleep later than older adults.",
+	"adults": "Much of the day is for work or household activities. The end of the day is often spent watching television.",
+	"seniors": "Most do not work and spend more time watching television than those who are younger. Naps during the day are also more common.",
+	"kids": "Less time is spent watching television and more time is spent with family care. A larger percentage of people also work during the peak hours than those without children.",
+	"young": "Among the listed demographics, those with infants spend the most time with family care.",
+	"nokids": "Breakfast is more common than those with children, with more time for television in the evening."
+};
+
+
+$("#filters a").click(function() {
+	$("#filters a").removeClass("current");
+	$(this).addClass("current");
+	
+	var demog = $(this).text();
+	var demogid = $(this).attr("id");
+	
+	$("#explain h3").text(demog);
+	$("#explain p").html(explain[demogid]);
+});
+
+</script>
+</body>
+</html>

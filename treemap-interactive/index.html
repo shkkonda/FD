@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/style.css" type="text/css" media="screen"/>
+
+
+<div id="filters">
+    
+    <div id="leftfilters">
+        <div id="stateselect">
+            <label for="statesmenu">Place of Interest</label>
+            <select name="statesmenu">
+                <option value="nat">United States</option>
+                <option disabled>─────────</option>
+                <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="DC">District of Columbia</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
+                <option disabled>─────────</option>
+                <option value="GU">Guam</option><option value="PR">Puerto Rico</option><option value="VI">Virgin Islands</option>
+            </select>
+        </div><!-- @end #stateselect -->
+
+        <div id="showjobcats">
+            <form>
+              <input type="checkbox" name="parentcheck" value="on" id="parentcheck" />
+              <label for="parentcheck">Show Job Categories</label>
+            </form>
+        </div><!-- @end #showjobcats -->
+    </div><!-- @end #leftfilters -->
+
+    <div id="rightfilters">
+        <div id="sliderholder">
+            <label>Median Annual Salary</label>
+        </div>
+    </div><!-- @end #rightfilters -->
+    
+    <div class="clr"></div>
+</div><!-- @end #filters -->
+
+<div id="jobs">
+    <div id="treemapholder"></div>
+    <div id="tooltip" class="hidden">
+        <div id="jobgroup"></div>
+        <div id="jobtitle"></div>
+        <div id="jobsalary"></div>
+        <div id="jobemptot"></div>
+    </div>
+    <div id="loadprogress">Loading Data&hellip;<br /><span class="progvalue">0</span>%</div>
+</div><!-- @end #jobs -->
+
+
+<div id="credits">
+    By: FlowingData.com | Source: Bureau of Labor Statistics
+</div><!-- @end #credits -->
+
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var margin = {top: 40, right: 0, bottom: 10, left: 0},
+    width = 954,
+    height = 600;
+
+var currState = 'nat';
+var medCutoff = 40000;
+var showParentLab = false;
+var currOcc = null;
+
+var treemap = d3.layout.treemap()
+    .size([width, height])
+    .sticky(true)
+    .padding(2)
+    .sort(function(a, b) { return a.value - b.value; })
+    .value(function(d) { return d[currState]; });
+    
+var div = d3.select("body #treemapholder").append("div")
+    .attr("id", "treemap")
+    .style("position", "relative")
+    .style("width", (width + margin.left + margin.right) + "px")
+    .style("height", (height + margin.top + margin.bottom) + "px")
+    .style("left", margin.left + "px")
+    .style("top", margin.top + "px");
+
+
+// Load the employment data
+d3.json("data/occs2013.json")
+    
+    // Show loading progress for data file
+    .on("progress", function() {
+        d3.select("#loadprogress .progvalue").text(Math.round(100 * d3.event.loaded / 1075072));
+    })
+    .get(function(error, root) {
+        d3.select("#loadprogress").remove();
+        var node = div.datum(root).selectAll(".node")
+            .data(treemap.nodes)
+            .enter().append("div")
+                .attr("class", function(d) { return d.children ? "parent node" : "node"; })
+                .attr("id", function(d) { return 'occnode' + d.ocode })
+                .call(position);
+
+
+        // Append labels to wider rectangles
+        var label = node.append("div")
+            .attr("class", "childlabel")
+            .text(function(d) {
+                if (d.children || d.dx*d.dy < 800) { return null; }
+                else { return d.name; }
+            });
+
+
+        // Append group labels on top
+        d3.selectAll(".parent").data().map(function(d) {  
+            if (d.name === "occs") return null;
+            if (d.dx <= 22) return null;
+            if (d.dy <= 22) return null;
+                div.append("div")
+                    .text(d.name)
+                    .style("left", d.x + "px")
+                    .style("top", d.y + "px")
+                    .style("width", (d.dx-22) + "px")
+                    .style("height", (d.dy-22) + "px")
+                    .attr("class", "parentlabel")
+                    .attr("id", "plab"+d.ocode);
+        });
+
+        node.attr("class", medHighlight);
+
+        // State selection
+        var select = d3.selectAll("select").on("change", function change() {
+
+            // Update nodes to new state
+            currState = this.value;
+            var value = function(d) { return d[currState]; }
+            node
+                .data(treemap.value(value).nodes)
+                .transition()
+                .duration(1000)
+                .call(position)
+                .call(positionParentLabels);
+
+            // Addjust job labels
+            node.selectAll("div.childlabel")
+                .text(function(d) {
+                    if (d.children || d.dx*d.dy < 800) { return null; }
+                    else { return d.name; }
+                });
+
+            // Adjust median salary highlighting
+            node
+                .attr("class", medHighlight);
+        });
+
+
+        // Adjust parent labels on checkbox
+        d3.selectAll("#parentcheck").on("change", function change() {
+            showParentLab = this.checked;
+            d3.selectAll(".parentlabel")
+                .call(positionParentLabels);
+        });
+
+
+        // Tooltip effects
+        node.on("mouseover", function(d) {
+            if (!d.children) {
+
+                // Add job category and job name
+                d3.select("#tooltip #jobgroup").text(d.parent.name);
+                d3.select("#tooltip #jobtitle").text(d.name);
+
+                // Format median salary
+                if (d[currState + "m"] == -99) {
+                    var salaryText = "Estimate unavailable";
+                } else if (d[currState + "m"] > 187200) {
+                    var salaryText = "More than $187,200 per year"
+                } else {
+                    var salaryText = "$" + numberWithCommas(d[currState + "m"]) + " per year";
+                }
+                d3.select("#tooltip #jobsalary").text(salaryText);
+                
+                // Add employee count  
+                var empText = numberWithCommas(d[currState]) + " people";
+                d3.select("#tooltip #jobemptot").text(empText);
+
+                // Adjust the width and height
+                var w = d3.select("#tooltip").style("width");
+                var h = d3.select("#tooltip").attr("height");
+
+                // Get mouse position and then adjust tooltip position accordingly
+                var jobsNode = d3.select("#jobs").node();
+                var absMousePos = d3.mouse(jobsNode);
+
+                if (absMousePos[0] > 700) {
+                    var xpos = absMousePos[0] - parseFloat(w) - 30;
+                } else {
+                    var xpos = absMousePos[0] + 10;
+                }
+
+                if (absMousePos[1] > 400) {
+                    var ypos = absMousePos[1] - 50;
+                } else {
+                    var ypos = absMousePos[1] - 20;
+                }
+
+                d3.select("#tooltip")
+                    .style("left", xpos + "px")
+                    .style("top", ypos + "px");
+
+                // Display the tooltip
+                d3.select("#tooltip").classed("hidden", false);
+            }
+        })
+        .on("mouseout", function(d) {
+            // Hide the tooltip
+            d3.select("#tooltip").classed("hidden", true);
+        });
+
+
+        // Slider
+        var slideMargin = {top: 0, right: 30, bottom: 10, left: 8},
+            slideWidth = 773 - slideMargin.left - slideMargin.right,
+            slideHeight = 75 - slideMargin.bottom - slideMargin.top;
+
+        var x = d3.scale.linear()
+            .domain([15000, 180000])
+            .range([0, slideWidth])
+            .clamp(true);
+
+        var brush = d3.svg.brush()
+            .x(x)
+            .extent([0,0])
+            .on("brush", brushed);
+
+        var svg = d3.select("#sliderholder").append("svg")
+            .attr("width", slideWidth + slideMargin.left + slideMargin.right)
+            .attr("height", slideHeight + slideMargin.top + slideMargin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + slideMargin.left + "," + slideMargin.top + ")");
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + slideHeight / 2 + ")")
+            .call(d3.svg.axis()
+                .scale(x)
+                .orient("bottom")
+                .tickFormat(function(d) {
+                    if (d == 180000) return '> $' + numberWithCommas(d);
+                    else return '$' + numberWithCommas(d); 
+                })
+                .tickSize(0)
+                .tickPadding(12))
+            .select(".domain")
+            .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+                .attr("class", "halo");
+
+
+        var slider = svg.append("g")
+            .attr("class", "slider")
+            .call(brush);
+
+        slider.selectAll(".extent,.resize")
+            .remove();
+
+        slider.select(".background")
+            .attr("height", slideHeight);
+
+        var highlighter = slider.append("rect")
+            .attr("class", "highlighter")
+            .attr("height", 4)
+            .attr("x", x(medCutoff))
+            .attr("width", slideWidth-x(medCutoff)+2)
+            .attr("transform", "translate(0," + (slideHeight / 2 - 2) + ")");
+
+        var handle = slider.append("circle")
+            .attr("class", "handle")
+            .attr("transform", "translate(0," + slideHeight / 2 + ")")
+            .attr("r", 7)
+            .attr("cx", x(medCutoff));
+
+
+        // Adjust node colors accordingly when median salary selected
+        function brushed() {
+            var value = brush.extent()[0];
+
+            if (d3.event.sourceEvent) { // not a programmatic event
+                value = x.invert(d3.mouse(this)[0]);
+                brush.extent([value, value]);
+            }
+
+            handle.attr("cx", x(value));
+            highlighter
+                .attr("x", x(value))
+                .attr("width", slideWidth-x(value)+2);
+
+            var highlight = function(d) { 
+                var cssclass;
+                if (d.children) {
+                    cssclass = "parent node"; 
+                } else if (d[currState+"m"] > value && !d.children) {
+                    cssclass = "node highlight";
+                } else {
+                    cssclass = "node";
+                }
+                return cssclass;
+            }
+            
+            node
+              .attr("class", highlight);
+            
+            // Set the current median salary
+            medCutoff = value;
+        }
+    
+    }); // @end on load event
+
+
+
+function position() {
+  this.style("left", function(d) { return d.x + "px"; })
+      .style("top", function(d) { return d.y + "px"; })
+      .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
+      .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
+}
+
+function positionParentLabels() {
+    d3.selectAll(".parent").data().map(function(d) {
+        
+        d3.select("#plab" + d.ocode)
+            .transition().duration(1000)
+            .style("left", d.x + "px")
+            .style("top", d.y + "px")
+            .style("width", (d.dx-22) + "px")
+            .style("height", (d.dy-22) + "px")
+            .style("display", function() { return d.dx > 22 && showParentLab ? "block" : "none" });
+        });
+}
+
+function medHighlight(d) {
+      if (d.children) {
+         return "parent node"; 
+      } else if (d[currState+"m"] > medCutoff && !d.children) {
+          return "node highlight";
+      } else {
+          return "node";
+      }
+}
+
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+</script>
+
+

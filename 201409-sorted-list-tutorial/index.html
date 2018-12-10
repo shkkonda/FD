@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Sorting List of Uncertainty</title>
+	<link rel="stylesheet" href="./css/uncertainty.css" type="text/css" media="screen"/>
+	<script src="./js/jquery-1.10.2.min.js"></script>
+	<script src="./js/jquery.color.js"></script>
+</head>
+<body>
+<div id="content">
+    
+    <div id="filters">
+        <div class="dataset" data-filename="./data/mean-travel-time.json">
+            <h2>Commute</h2>
+            <div class="description">
+                Mean travel time to work in minutes
+            </div>
+            <div class="source">2009-2011 American Community Survey</div>
+        </div>
+        <div class="dataset" data-filename="./data/median-household-income.json">
+            <h2>Income</h2>
+            <div class="description">
+                Median household income in dollars
+            </div>
+            <div class="source">2009-2011 American Community Survey</div>
+        </div>
+        <div class="dataset" data-filename="./data/mean-hours-worked.json">
+            <h2>Work</h2>
+            <div class="description">
+                Mean hours worked per week
+            </div>
+            <div class="source">2011 American Community Survey</div>
+        </div>
+        <div class="dataset" data-filename="./data/median-housing-value.json">
+            <h2>Housing</h2>
+            <div class="description">
+                Median housing value in dollars
+            </div>
+            <div class="source">2011 American Community Survey</div>
+        </div>
+        
+        
+        <div id="color-schemes">
+            <h3>Color Options</h2>
+            
+            <div id="blue-orange" class="scheme current" lo="#f1ac75" neu="#f0f0f0" hi="#b3c8e4">
+                <div class="lo" style="background-color:#f1ac75"></div>
+                <div class="neu" style="background-color:#f0f0f0"></div>
+                <div class="hi" style="background-color:#b3c8e4"></div>
+            </div>
+            
+            
+            <div id="bw" class="scheme" lo="#ccc" neu="#f0f0f0" hi="#888">
+                <div class="lo" style="background-color:#ccc"></div>
+                <div class="neu" style="background-color:#f0f0f0"></div>
+                <div class="hi" style="background-color:#888"></div>
+            </div>
+            
+            <div id="red-green" class="scheme" lo="#ff0000" hi="#00ff00" neu="#ccc">
+                <div class="lo" style="background-color:#ff0000"></div>
+                <div class="neu" style="background-color:#ccc"></div>
+                <div class="hi" style="background-color:#00ff00"></div>
+            </div>
+            
+        </div><!-- @end color-schemes -->
+        
+    </div><!-- @end filters -->
+
+
+    <div id="rankings">
+        <div id="states-header">
+            <span class="s">State</span>
+            <span class="v">Value</span>
+            <span class="se">S.E.</span>
+        </div>
+        
+        <ol id="numranks"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ol>
+        <ul id="states"><li id="AL">Alabama<div class="val"></div><div class="se"></div><div class="se"></div></li><li id="AK">Alaska<div class="val"></div><div class="se"></div><div class="se"></div></li><li id="AZ">Arizona<div class="val"></div><div class="se"></div><div class="se"></div></li><li id="AR">Arkansas<div class="val"></div><div class="se"></div></li><li id="CA">California<div class="val"></div><div class="se"></div></li><li id="CO">Colorado<div class="val"></div><div class="se"></div></li><li id="CT">Connecticut<div class="val"></div><div class="se"></div></li><li id="DE">Delaware<div class="val"></div><div class="se"></div></li><li id="DC">District of Columbia<div class="val"></div><div class="se"></div></li><li id="FL">Florida<div class="val"></div><div class="se"></div></li><li id="GA">Georgia<div class="val"></div><div class="se"></div></li><li id="HI">Hawaii<div class="val"></div><div class="se"></div></li><li id="ID">Idaho<div class="val"></div><div class="se"></div></li><li id="IL">Illinois<div class="val"></div><div class="se"></div></li><li id="IN">Indiana<div class="val"></div><div class="se"></div></li><li id="IA">Iowa<div class="val"></div><div class="se"></div></li><li id="KS">Kansas<div class="val"></div><div class="se"></div></li><li id="KY">Kentucky<div class="val"></div><div class="se"></div></li><li id="LA">Louisiana<div class="val"></div><div class="se"></div></li><li id="ME">Maine<div class="val"></div><div class="se"></div></li><li id="MD">Maryland<div class="val"></div><div class="se"></div></li><li id="MA">Massachusetts<div class="val"></div><div class="se"></div></li><li id="MI">Michigan<div class="val"></div><div class="se"></div></li><li id="MN">Minnesota<div class="val"></div><div class="se"></div></li><li id="MS">Mississippi<div class="val"></div><div class="se"></div></li><li id="MO">Missouri<div class="val"></div><div class="se"></div></li><li id="MT">Montana<div class="val"></div><div class="se"></div></li><li id="NE">Nebraska<div class="val"></div><div class="se"></div></li><li id="NV">Nevada<div class="val"></div><div class="se"></div></li><li id="NH">New Hampshire<div class="val"></div><div class="se"></div></li><li id="NJ">New Jersey<div class="val"></div><div class="se"></div></li><li id="NM">New Mexico<div class="val"></div><div class="se"></div></li><li id="NY">New York<div class="val"></div><div class="se"></div></li><li id="NC">North Carolina<div class="val"></div><div class="se"></div></li><li id="ND">North Dakota<div class="val"></div><div class="se"></div></li><li id="OH">Ohio<div class="val"></div><div class="se"></div></li><li id="OK">Oklahoma<div class="val"></div><div class="se"></div></li><li id="OR">Oregon<div class="val"></div><div class="se"></div></li><li id="PA">Pennsylvania<div class="val"></div><div class="se"></div></li><li id="RI">Rhode Island<div class="val"></div><div class="se"></div></li><li id="SC">South Carolina<div class="val"></div><div class="se"></div></li><li id="SD">South Dakota<div class="val"></div><div class="se"></div></li><li id="TN">Tennessee<div class="val"></div><div class="se"></div></li><li id="TX">Texas<div class="val"></div><div class="se"></div></li><li id="UT">Utah<div class="val"></div><div class="se"></div></li><li id="VT">Vermont<div class="val"></div><div class="se"></div></li><li id="VA">Virginia<div class="val"></div><div class="se"></div></li><li id="WA">Washington<div class="val"></div><div class="se"></div></li><li id="WV">West Virginia<div class="val"></div><div class="se"></div></li><li id="WI">Wisconsin<div class="val"></div><div class="se"></div></li><li id="WY">Wyoming<div class="val"></div><div class="se"></div></li></ul>
+        
+        <div class="clr"></div>
+    </div>
+
+    
+    <div class="clr"></div>
+
+    <script type="text/javascript">
+    function commaSeparateNumber(val){
+        while (/(\d+)(\d{3})/.test(val.toString())){
+          val = val.toString().replace(/(\d+)(\d{3})/, '$1'+','+'$2');
+        }
+        return val;
+      }
+    
+    $(document).ready(function() {
+        
+        var currentState = null;
+        var holdState = false;
+        var sortedStates;
+        
+        loCol = $('.scheme.current').attr('lo');
+        neuCol = $('.scheme.current').attr('neu');
+        hiCol = $('.scheme.current').attr('hi');
+        
+        
+        $("#states li").each(function(i) {
+            var abbrev = $(this).attr('id');
+            var itemHeight = parseInt( $(this).css('height') );
+            var itemPadding = parseInt( $(this).css('padding-top') );
+            var offset = i * itemHeight + 2*i*itemPadding;
+            $('#'+abbrev).css('top', offset);
+        });
+        
+        
+        $('#states li').click(function() {
+            if ($(this).attr('id') == currentState && holdState) {  // Toggling current state
+                $(this).removeClass('hold');
+                holdState = false;
+            } else if (holdState) {                                 // Changing states
+                $('#states li').removeClass('hold');
+                $(this).addClass('hold');
+                currentState = $(this).attr('id');
+            } else {                                                // First state selected
+                $(this).addClass('hold');
+                holdState = true;
+                currentState = $(this).attr('id');
+            }
+
+            if (holdState) {
+                var id = $(this).attr('id');
+                currentState = id;
+
+                var val = parseFloat( $(this).attr('val') );
+                var se = parseFloat( $(this).attr('se') );
+                var rangeMin = val - 3*se;
+                var rangeMax = val + 3*se;
+
+                $.each(sortedStates, function(i) {
+                    var stateVal = parseFloat( $(this).attr('val') );
+                    var stateSE = parseFloat( $(this).attr('se') );
+                    var stateMin = stateVal - 3 * stateSE;
+                    var stateMax = stateVal + 3 * stateSE;
+
+                    // Color states based on range
+                    if ($(this).attr('id') != id) {
+                        // If not significantly different
+                        if ( (rangeMin <= stateMax && stateMin <= rangeMax) ) {
+                            $(this).animate({'backgroundColor': neuCol }, 200);
+                        } else if (stateVal < val) {
+                            $(this).animate({'backgroundColor': loCol }, 200);
+                        } else {
+                            $(this).animate({'backgroundColor': hiCol }, 200);
+                        }
+                    }
+                });
+
+                $(this).css('background', '#ffffff');
+            }
+        });
+        
+        
+        // Mouseover activity
+        $("#states li").mouseover(function() {
+            
+            if (!holdState) {
+                var id = $(this).attr('id');
+                currentState = id;
+
+                var val = parseFloat( $(this).attr('val') );
+                var se = parseFloat( $(this).attr('se') );
+                var rangeMin = val - 3*se;
+                var rangeMax = val + 3*se;
+
+                $.each(sortedStates, function(i) {
+                    var stateVal = parseFloat( $(this).attr('val') );
+                    var stateSE = parseFloat( $(this).attr('se') );
+                    var stateMin = stateVal - 3 * stateSE;
+                    var stateMax = stateVal + 3 * stateSE;
+
+                    // Color states based on range
+                    if ($(this).attr('id') != id) {
+                        // If not significantly different
+                        if ( (rangeMin <= stateMax && stateMin <= rangeMax) ) {
+                            $(this).css('background', neuCol);
+                        } else if (stateVal < val) {
+                            $(this).css('background', loCol);
+                        } else {
+                            $(this).css('background', hiCol);
+                        }
+                    }
+
+                });
+
+                $(this).css('background', '#ffffff');
+            }
+            
+        });
+        
+        
+        
+        // Clicking filters
+        $('#filters .dataset').click(function() {
+            
+            $('.dataset.current').removeClass('current');
+            $(this).addClass('current');
+            
+            // Load data
+            $.get($(this).attr('data-filename'), function(data) {
+                
+                // Populate with values
+                $.each(data, function() {
+                    $("#states #"+this.abbrev).attr({ val: this.val, se:this.se });
+                    $("#states #"+this.abbrev+' .val').html(commaSeparateNumber(this.val));
+                    $("#states #"+this.abbrev+' .se').html(commaSeparateNumber(this.se));
+                    
+                });
+
+                // Sorting
+                sortedStates = $('#states li').sort(function (a,b) {
+                    var contentA = parseFloat( $(a).attr('val') );
+                    var contentB = parseFloat( $(b).attr('val') );
+                    return (contentA > contentB) ? -1 : (contentA < contentB) ? 1 : 0;            
+                });
+
+                // Arrange by the sort
+                // $('#states li').css('position', 'absolute');
+                $.each(sortedStates, function(i) {
+                    var abbrev = $(this).attr('id');
+                    var itemHeight = parseInt( $(this).css('height') );
+                    var itemPadding = parseInt( $(this).css('padding-top') );
+                    var offset = i * itemHeight + 2*i*itemPadding;
+                    $('#'+abbrev).animate({'top': offset }, 500);
+                });
+
+                
+                // If a state selected already
+                if (currentState != null) {
+                    
+                    var val = parseFloat( $('#'+currentState).attr('val') );
+                    var se = parseFloat( $('#'+currentState).attr('se') );
+                    var rangeMin = val - 3*se;
+                    var rangeMax = val + 3*se;
+                    
+                    $.each(sortedStates, function(i) {
+                        var stateVal = parseFloat( $(this).attr('val') );
+                        var stateSE = parseFloat( $(this).attr('se') );
+                        var stateMin = stateVal - 3 * stateSE;
+                        var stateMax = stateVal + 3 * stateSE;
+
+                        // Color states based on range
+                        if ($(this).attr('id') != currentState) {
+                            // If not significantly different
+                            if ( (rangeMin <= stateMax && stateMin <= rangeMax) ) {
+                                $(this).css('background', neuCol);
+                            } else if (stateVal < val) {
+                                $(this).css('background', loCol);
+                            } else {
+                                $(this).css('background', hiCol);
+                            }
+                        }
+                    });
+                } // @end if state selected
+
+            }, dataType='json');
+            
+            
+        }); // @end clicking filters
+        
+
+
+        // Changing color schems
+        $("#color-schemes .scheme").click(function() {
+            loCol = $(this).attr('lo');
+            neuCol = $(this).attr('neu');
+            hiCol = $(this).attr('hi');
+            
+            $('#color-schemes .scheme.current').removeClass('current');
+            $(this).addClass('current');
+            
+            // If a state selected already
+            if (currentState != null) {
+                
+                var val = parseFloat( $('#'+currentState).attr('val') );
+                var se = parseFloat( $('#'+currentState).attr('se') );
+                var rangeMin = val - 3*se;
+                var rangeMax = val + 3*se;
+                
+                $.each(sortedStates, function(i) {
+                    var stateVal = parseFloat( $(this).attr('val') );
+                    var stateSE = parseFloat( $(this).attr('se') );
+                    var stateMin = stateVal - 3 * stateSE;
+                    var stateMax = stateVal + 3 * stateSE;
+
+                    // Color states based on range
+                    if ($(this).attr('id') != currentState) {
+                        // If not significantly different
+                        if ( (rangeMin <= stateMax && stateMin <= rangeMax) ) {
+                            $(this).animate({'backgroundColor': neuCol }, 200);
+                        } else if (stateVal < val) {
+                            $(this).animate({'backgroundColor': loCol }, 200);
+                        } else {
+                            $(this).animate({'backgroundColor': hiCol }, 200);
+                        }
+                    }
+                });
+            } // @end if state selected
+        });
+
+        
+    }); // @end document ready
+    </script>
+    
+</div><!-- @end #content -->
+</body>
+</html>

@@ -1,0 +1,147 @@
+/* Normalize */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, p, blockquote, th, td, legend {
+	margin: 0;
+	padding: 0;
+}
+h1,h2,h3,h4,h5,h6 { font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 100%; }
+address, caption, cite, code, dfn, th, var { font-style: normal; font-weight: normal; }
+table { border-collapse: collapse; border-spacing: 0; }
+fieldset,img { border: 0; }
+caption,th { text-align: left; }
+/* @end */
+
+
+
+#content {
+    padding: 20px;
+    font-family: Helvetica, Arial, serif;
+}
+#filters {
+    width: 300px;
+    float: left;
+    border-top: 1px solid #ccc;
+    margin: 18px 30px 0 0;
+}
+    .dataset {
+        padding: 30px 20px;
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+    }
+    .dataset.current {
+        background: #e0e0e0;
+    }
+    .dataset h2 {
+        line-height: 1.3em;
+        margin-bottom: 0.2em;
+    }
+    .dataset .description {
+        font-size: 0.9em;
+        margin-bottom: 0.5em;
+    }
+    .dataset .source {
+        font-size: 0.7em;
+        color: #999;
+    }
+
+
+#color-schemes {
+    margin-top: 60px;
+}
+    #color-schemes h3 {
+        text-align: center;
+        font-weight: normal;
+        font-style: italic;
+        font-size: 0.9em;
+    }
+    #color-schemes .scheme {
+        border: 1px solid #ccc;
+        width: 240px;
+        height: 20px;
+        margin: 10px auto;
+    }
+    #color-schemes .scheme.current {
+        border: 1px solid #000;
+    }
+    #color-schemes .scheme div {
+        width: 80px;
+        height: 20px;
+        float: left;
+    }
+
+    
+#rankings {
+    float: left;
+}
+#states-header {
+    font-size: 0.7em;
+    position: relative;
+    width: 350px;
+    height: 18px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #000;
+    margin-bottom: 14px;
+}
+    #states-header span {
+        position: absolute;
+    }
+    #states-header .s {
+        left: 88px;
+    }
+    #states-header .v {
+        left: 230px;
+    }
+    #states-header .se {
+        left: 280px;
+    }
+
+#numranks {
+    margin: 0 10px 20px 40px;
+    height: 1040px;
+    position: relative;
+    float: left;
+    font-family: Helvetica, sans-serif;
+    color: #999;
+}
+#rankings li {
+    font-size: 0.75em;
+    padding: 2px;
+}
+#states {
+    margin: 0 40px 20px 0;
+    position: relative;
+    float: left;
+    
+}
+    #states li {
+        width: 250px;
+        position: absolute;
+        list-style-type: none;
+        border-left: 10px solid #fff;
+        border-right: 10px solid #fff;
+        padding: 2px 5px;
+    }
+    #states li .val {
+        position: absolute;
+        font-size: 0.8em;
+        left: 170px;
+        top: 2px;
+    }
+    #states li .se {
+        position: absolute;
+        font-size: 0.8em;
+        left: 220px;
+        top: 2px;
+        color: #aaa;
+    }
+    #states li.hold {
+        border-left: 10px solid #000000;
+        border-right: 10px solid #000000;
+    }
+    
+
+.clr { clear: both; }
+.meta { color: #999999; }
+
+#debug {
+    margin-top: 100px;
+}

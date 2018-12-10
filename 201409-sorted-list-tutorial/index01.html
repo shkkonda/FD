@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Sorting List of Uncertainty</title>
+	<link rel="stylesheet" href="./css/uncertainty.css" type="text/css" media="screen"/>
+	<script src="./js/jquery-1.10.2.min.js"></script>
+	<script src="./js/jquery.color.js"></script>
+</head>
+<body>
+<div id="content">
+    
+    <div id="filters">
+        <div class="dataset" data-filename="./data/mean-travel-time.json">
+            <h2>Commute</h2>
+            <div class="description">
+                Mean travel time to work in minutes
+            </div>
+            <div class="source">2009-2011 American Community Survey</div>
+        </div>        
+    </div><!-- @end filters -->
+
+
+    <div id="rankings">
+        <div id="states-header">
+            <span class="s">State</span>
+            <span class="v">Value</span>
+            <span class="se">S.E.</span>
+        </div>
+        
+        <ol id="numranks"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ol>
+        <ul id="states"><li id="AL">Alabama<div class="val"></div><div class="se"></div><div class="se"></div></li><li id="AK">Alaska<div class="val"></div><div class="se"></div><div class="se"></div></li><li id="AZ">Arizona<div class="val"></div><div class="se"></div><div class="se"></div></li><li id="AR">Arkansas<div class="val"></div><div class="se"></div></li><li id="CA">California<div class="val"></div><div class="se"></div></li><li id="CO">Colorado<div class="val"></div><div class="se"></div></li><li id="CT">Connecticut<div class="val"></div><div class="se"></div></li><li id="DE">Delaware<div class="val"></div><div class="se"></div></li><li id="DC">District of Columbia<div class="val"></div><div class="se"></div></li><li id="FL">Florida<div class="val"></div><div class="se"></div></li><li id="GA">Georgia<div class="val"></div><div class="se"></div></li><li id="HI">Hawaii<div class="val"></div><div class="se"></div></li><li id="ID">Idaho<div class="val"></div><div class="se"></div></li><li id="IL">Illinois<div class="val"></div><div class="se"></div></li><li id="IN">Indiana<div class="val"></div><div class="se"></div></li><li id="IA">Iowa<div class="val"></div><div class="se"></div></li><li id="KS">Kansas<div class="val"></div><div class="se"></div></li><li id="KY">Kentucky<div class="val"></div><div class="se"></div></li><li id="LA">Louisiana<div class="val"></div><div class="se"></div></li><li id="ME">Maine<div class="val"></div><div class="se"></div></li><li id="MD">Maryland<div class="val"></div><div class="se"></div></li><li id="MA">Massachusetts<div class="val"></div><div class="se"></div></li><li id="MI">Michigan<div class="val"></div><div class="se"></div></li><li id="MN">Minnesota<div class="val"></div><div class="se"></div></li><li id="MS">Mississippi<div class="val"></div><div class="se"></div></li><li id="MO">Missouri<div class="val"></div><div class="se"></div></li><li id="MT">Montana<div class="val"></div><div class="se"></div></li><li id="NE">Nebraska<div class="val"></div><div class="se"></div></li><li id="NV">Nevada<div class="val"></div><div class="se"></div></li><li id="NH">New Hampshire<div class="val"></div><div class="se"></div></li><li id="NJ">New Jersey<div class="val"></div><div class="se"></div></li><li id="NM">New Mexico<div class="val"></div><div class="se"></div></li><li id="NY">New York<div class="val"></div><div class="se"></div></li><li id="NC">North Carolina<div class="val"></div><div class="se"></div></li><li id="ND">North Dakota<div class="val"></div><div class="se"></div></li><li id="OH">Ohio<div class="val"></div><div class="se"></div></li><li id="OK">Oklahoma<div class="val"></div><div class="se"></div></li><li id="OR">Oregon<div class="val"></div><div class="se"></div></li><li id="PA">Pennsylvania<div class="val"></div><div class="se"></div></li><li id="RI">Rhode Island<div class="val"></div><div class="se"></div></li><li id="SC">South Carolina<div class="val"></div><div class="se"></div></li><li id="SD">South Dakota<div class="val"></div><div class="se"></div></li><li id="TN">Tennessee<div class="val"></div><div class="se"></div></li><li id="TX">Texas<div class="val"></div><div class="se"></div></li><li id="UT">Utah<div class="val"></div><div class="se"></div></li><li id="VT">Vermont<div class="val"></div><div class="se"></div></li><li id="VA">Virginia<div class="val"></div><div class="se"></div></li><li id="WA">Washington<div class="val"></div><div class="se"></div></li><li id="WV">West Virginia<div class="val"></div><div class="se"></div></li><li id="WI">Wisconsin<div class="val"></div><div class="se"></div></li><li id="WY">Wyoming<div class="val"></div><div class="se"></div></li></ul>
+        
+        <div class="clr"></div>
+    </div>
+
+    <script type="text/javascript">
+    function commaSeparateNumber(val){
+        while (/(\d+)(\d{3})/.test(val.toString())){
+          val = val.toString().replace(/(\d+)(\d{3})/, '$1'+','+'$2');
+        }
+        return val;
+      }
+    
+    $(document).ready(function() {
+        
+        var currentState = null;
+        var holdState = false;
+        var sortedStates;
+        
+        $("#states li").each(function(i) {
+            var abbrev = $(this).attr('id');
+            var itemHeight = parseInt( $(this).css('height') );
+            var itemPadding = parseInt( $(this).css('padding-top') );
+            var offset = i * itemHeight + 2*i*itemPadding;
+            $('#'+abbrev).css('top', offset);
+        });
+    
+    });
+    </script>
+    
+</div><!-- @end #content -->
+</body>
+</html>
